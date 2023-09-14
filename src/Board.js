@@ -35,15 +35,20 @@ function Board({ nrows=5, ncols=5, chanceLightStartsOn }) {
     for(let row = 0; row<nrows;row++){
       initialBoard.push([]);
       for(let col = 0; col<ncols;col++){
-        if(Math.random() >.5) initialBoard[row].push(false);
-        else initialBoard[row].push(true);
+        if(Math.random() >.5) initialBoard[row].push(true);
+        else initialBoard[row].push(false);
       }
     }
     return initialBoard;
   }
-
+  //returns bool of victory
   function hasWon() {
-    // TODO: check the board in state to determine whether the player has won.
+    let won = true;
+    for(let row = 0; row<nrows;row++)
+      for(let col = 0; col<ncols;col++)
+        if(won &&board[row][col]) won = false;
+    //console.log(won);
+    return won;
   }
 
   function flipCellsAround(coord) {
@@ -58,19 +63,32 @@ function Board({ nrows=5, ncols=5, chanceLightStartsOn }) {
         }
       };
 
-      // TODO: Make a (deep) copy of the oldBoard
+      //Make a (deep) copy of the oldBoard
+      let boardCopy = [];
+      for(let row = 0; row<nrows;row++){
+        boardCopy.push([]);
+        for(let col = 0; col<ncols;col++){
+          boardCopy[row].push(oldBoard[row][col]);
+        }
+      }
 
-      // TODO: in the copy, flip this cell and the cells around it
+      //in the copy, flip this cell and the cells around it
+      flipCell(y,x,boardCopy);
+      flipCell(y+1,x,boardCopy)
+      flipCell(y-1,x,boardCopy);
+      flipCell(y,x+1,boardCopy);
+      flipCell(y,x-1,boardCopy);
 
-      // TODO: return the copy
+      //return the copy
+      return boardCopy;
     });
   }
 
+  //helper function that actally gets attatched to the cells
   function flipCellsAroundMe(evt){
-    console.log(evt.target);
+    flipCellsAround(evt.target.id);
   }
 
-  // if the game is won, just show a winning msg & render nothing else
 
   //create the board to be rendered in HTML
   let renderedBoard = [];
@@ -79,16 +97,21 @@ function Board({ nrows=5, ncols=5, chanceLightStartsOn }) {
     for(let col = 0; col<ncols;col++){
       filledRow.push(<Cell flipCellsAroundMe={flipCellsAroundMe} 
                           isLit={board[row][col]}
-                          key = {`${row}-${col}`}/>)
+                          key = {`${row}-${col}`}
+                          id = {`${row}-${col}`}
+                          />);
     }
     renderedBoard.push(<tr>{filledRow}</tr>);
-    console.log("anything at all");
   }
   
+  // if the game is won, just show a winning msg & render nothing else
+  if(hasWon()) renderedBoard = (<td>You won</td>)
   return(
     <div className="Board">
       <table>
-        {renderedBoard}
+        <tbody>
+          {renderedBoard}
+        </tbody>
       </table>
     </div>
   )
