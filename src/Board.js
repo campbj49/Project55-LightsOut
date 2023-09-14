@@ -27,13 +27,18 @@ import "./Board.css";
  *
  **/
 
-function Board({ nrows, ncols, chanceLightStartsOn }) {
+function Board({ nrows=5, ncols=5, chanceLightStartsOn }) {
   const [board, setBoard] = useState(createBoard());
-
   /** create a board nrows high/ncols wide, each cell randomly lit or unlit */
   function createBoard() {
     let initialBoard = [];
-    // TODO: create array-of-arrays of true/false values
+    for(let row = 0; row<nrows;row++){
+      initialBoard.push([]);
+      for(let col = 0; col<ncols;col++){
+        if(Math.random() >.5) initialBoard[row].push(false);
+        else initialBoard[row].push(true);
+      }
+    }
     return initialBoard;
   }
 
@@ -61,13 +66,32 @@ function Board({ nrows, ncols, chanceLightStartsOn }) {
     });
   }
 
+  function flipCellsAroundMe(evt){
+    console.log(evt.target);
+  }
+
   // if the game is won, just show a winning msg & render nothing else
 
-  // TODO
-
-  // make table board
-
-  // TODO
+  //create the board to be rendered in HTML
+  let renderedBoard = [];
+  for(let row = 0; row<nrows;row++){
+    let filledRow = [];
+    for(let col = 0; col<ncols;col++){
+      filledRow.push(<Cell flipCellsAroundMe={flipCellsAroundMe} 
+                          isLit={board[row][col]}
+                          key = {`${row}-${col}`}/>)
+    }
+    renderedBoard.push(<tr>{filledRow}</tr>);
+    console.log("anything at all");
+  }
+  
+  return(
+    <div className="Board">
+      <table>
+        {renderedBoard}
+      </table>
+    </div>
+  )
 }
 
 export default Board;
